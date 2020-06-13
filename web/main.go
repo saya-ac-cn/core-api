@@ -10,6 +10,16 @@ import (
 	"strconv"
 )
 
+//在 Mac、Linux、Windows 下Go交叉编译
+//https://blog.csdn.net/x356982611/article/details/80054314
+/**Mac 下编译 Linux 和 Windows 64位可执行程序
+* CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build main.go
+* CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build main.go
+nohup ./main -p 9001 ->info.log &
+netstat -nap|grep 9001
+kill -9 21215
+**/
+
 // 启动地址及端口
 const DEFAULTPORT  = 8080
 

@@ -31,17 +31,20 @@ func NewMapSatsDao(engine *xorm.Engine) *MapStatsDao {
 
 // 查询一条或多条省级记录（不传任何值，返回所有）
 func (d *MapStatsDao) GetProvince(where entity.MapStatsEntity) []entity.MapStatsEntity {
+	args := make([]interface{}, 0)
 	datalist := make([]entity.MapStatsEntity,0)
 	err := error(nil)
 	var sql bytes.Buffer
 	sql.WriteString("SELECT `place_code` , `place_name`  FROM stats_province2019 WHERE  1 = 1 ")
 	if where.PlaceCode != "" {
-		sql.WriteString(" and `place_code` = '"+where.PlaceCode+"'")
+		sql.WriteString(" and `place_code` = ?")
+		args = append(args, where.PlaceCode)
 	}
 	if where.PlaceName != "" {
-		sql.WriteString(" and `place_name` LIKE CONCAT('"+where.PlaceName+"', '%')")
+		sql.WriteString(" and `place_name` LIKE CONCAT(?, '%')")
+		args = append(args, where.PlaceName)
 	}
-	err = d.engine.SQL(sql.String()).Find(&datalist)
+	err = d.engine.SQL(sql.String(),args...).Find(&datalist)
 	if err != nil{
 		log.Println(err)
 		return datalist
@@ -53,20 +56,24 @@ func (d *MapStatsDao) GetProvince(where entity.MapStatsEntity) []entity.MapStats
 
 // 查询一条或多条市级记录（不传任何值，返回所有）
 func (d *MapStatsDao) GetCity(where entity.MapStatsEntity) []entity.MapStatsEntity {
+	args := make([]interface{}, 0)
 	datalist := make([]entity.MapStatsEntity,0)
 	err := error(nil)
 	var sql bytes.Buffer
 	sql.WriteString("SELECT `place_code` , `place_name`, `full_name`,`province_code` as super_code  FROM stats_city2019 WHERE  1 = 1 ")
 	if where.PlaceCode != "" {
-		sql.WriteString(" and `place_code` = '"+where.PlaceCode+"'")
+		sql.WriteString(" and `place_code` = ?")
+		args = append(args, where.PlaceCode)
 	}
 	if where.PlaceName != "" {
-		sql.WriteString(" and `place_name` LIKE CONCAT('"+where.PlaceName+"', '%')")
+		sql.WriteString(" and `place_name` LIKE CONCAT(?, '%')")
+		args = append(args, where.PlaceName)
 	}
 	if where.SuperCode != "" {
-		sql.WriteString(" and `province_code` = '"+where.SuperCode+"'")
+		sql.WriteString(" and `province_code` = ?")
+		args = append(args, where.SuperCode)
 	}
-	err = d.engine.SQL(sql.String()).Find(&datalist)
+	err = d.engine.SQL(sql.String(),args...).Find(&datalist)
 	if err != nil{
 		log.Println(err)
 		return datalist
@@ -78,20 +85,24 @@ func (d *MapStatsDao) GetCity(where entity.MapStatsEntity) []entity.MapStatsEnti
 
 // 查询一条或多条县区级记录（不传任何值，返回所有）
 func (d *MapStatsDao) GetDistinct(where entity.MapStatsEntity) []entity.MapStatsEntity {
+	args := make([]interface{}, 0)
 	datalist := make([]entity.MapStatsEntity,0)
 	err := error(nil)
 	var sql bytes.Buffer
 	sql.WriteString("SELECT `place_code` , `place_name`, `full_name`,`city_code` as super_code  FROM stats_distinct2019 WHERE  1 = 1 ")
 	if where.PlaceCode != "" {
-		sql.WriteString(" and `place_code` = '"+where.PlaceCode+"'")
+		sql.WriteString(" and `place_code` = ?")
+		args = append(args, where.PlaceCode)
 	}
 	if where.PlaceName != "" {
-		sql.WriteString(" and `place_name` LIKE CONCAT('"+where.PlaceName+"', '%')")
+		sql.WriteString(" and `place_name` LIKE CONCAT(?, '%')")
+		args = append(args, where.PlaceName)
 	}
 	if where.SuperCode != "" {
-		sql.WriteString(" and `city_code` = '"+where.SuperCode+"'")
+		sql.WriteString(" and `city_code` = ?")
+		args = append(args, where.SuperCode)
 	}
-	err = d.engine.SQL(sql.String()).Find(&datalist)
+	err = d.engine.SQL(sql.String(),args...).Find(&datalist)
 	if err != nil{
 		log.Println(err)
 		return datalist
@@ -103,20 +114,24 @@ func (d *MapStatsDao) GetDistinct(where entity.MapStatsEntity) []entity.MapStats
 
 // 查询一条或多条镇级记录（不传任何值，返回所有）
 func (d *MapStatsDao) GetTown(where entity.MapStatsEntity) []entity.MapStatsEntity {
+	args := make([]interface{}, 0)
 	datalist := make([]entity.MapStatsEntity,0)
 	err := error(nil)
 	var sql bytes.Buffer
 	sql.WriteString("SELECT `place_code` , `place_name`, `full_name`,`distinct_code` as super_code  FROM stats_town2019 WHERE  1 = 1 ")
 	if where.PlaceCode != "" {
-		sql.WriteString(" and `place_code` = '"+where.PlaceCode+"'")
+		sql.WriteString(" and `place_code` = ?")
+		args = append(args, where.PlaceCode)
 	}
 	if where.PlaceName != "" {
-		sql.WriteString(" and `place_name` LIKE CONCAT('"+where.PlaceName+"', '%')")
+		sql.WriteString(" and `place_name` LIKE CONCAT(?, '%')")
+		args = append(args, where.PlaceName)
 	}
 	if where.SuperCode != "" {
-		sql.WriteString(" and `distinct_code` = '"+where.SuperCode+"'")
+		sql.WriteString(" and `distinct_code` = ?")
+		args = append(args, where.SuperCode)
 	}
-	err = d.engine.SQL(sql.String()).Find(&datalist)
+	err = d.engine.SQL(sql.String(),args...).Find(&datalist)
 	if err != nil{
 		log.Println(err)
 		return datalist
@@ -128,20 +143,24 @@ func (d *MapStatsDao) GetTown(where entity.MapStatsEntity) []entity.MapStatsEnti
 
 // 查询一条或多条村级记录（不传任何值，返回所有）
 func (d *MapStatsDao) GetVillage(where entity.MapStatsEntity) []entity.MapStatsEntity {
+	args := make([]interface{}, 0)
 	datalist := make([]entity.MapStatsEntity,0)
 	err := error(nil)
 	var sql bytes.Buffer
 	sql.WriteString("SELECT `place_code` , `place_name`, `full_name`,`town_code` as super_code  FROM stats_village2019 WHERE  1 = 1 ")
 	if where.PlaceCode != "" {
-		sql.WriteString(" and `place_code` = '"+where.PlaceCode+"'")
+		sql.WriteString(" and `place_code` = ?")
+		args = append(args, where.PlaceCode)
 	}
 	if where.PlaceName != "" {
-		sql.WriteString(" and `place_name` LIKE CONCAT('"+where.PlaceName+"', '%')")
+		sql.WriteString(" and `place_name` LIKE CONCAT(?, '%')")
+		args = append(args, where.PlaceName)
 	}
 	if where.SuperCode != "" {
-		sql.WriteString(" and `town_code` = '"+where.SuperCode+"'")
+		sql.WriteString(" and `town_code` = ?")
+		args = append(args, where.SuperCode)
 	}
-	err = d.engine.SQL(sql.String()).Find(&datalist)
+	err = d.engine.SQL(sql.String(),args...).Find(&datalist)
 	if err != nil{
 		log.Println(err)
 		return datalist

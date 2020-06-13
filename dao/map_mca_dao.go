@@ -58,20 +58,24 @@ func (d *MapMcaDao) GetProvince(where entity.ProvinceMcaEntity) []entity.Provinc
 
 // 查询一条或多条市级记录（不传任何值，返回所有）
 func (d *MapMcaDao) GetCity(where entity.CityMcaEntity) []entity.CityMcaEntity {
+	args := make([]interface{}, 0)
 	datalist := make([]entity.CityMcaEntity, 0)
 	err := error(nil)
 	var sql bytes.Buffer
 	sql.WriteString("select `place_code` ,`place_name`,`resident`,`population`,`area`,`phone_code`,`post_code`,`province_code` from mca_city2019 where  1 = 1 ")
 	if where.PlaceCode != "" {
-		sql.WriteString(" and `place_code` = '" + where.PlaceCode + "'")
+		sql.WriteString(" and `place_code` = ?")
+		args = append(args, where.PlaceCode)
 	}
 	if where.PlaceName != "" {
-		sql.WriteString(" and `place_name` LIKE CONCAT('" + where.PlaceName + "', '%')")
+		sql.WriteString(" and `place_name` LIKE CONCAT(?, '%')")
+		args = append(args, where.PlaceName)
 	}
 	if where.ProvinceCode != "" {
-		sql.WriteString(" and `province_code` = '" + where.ProvinceCode + "'")
+		sql.WriteString(" and `province_code` = ?")
+		args = append(args, where.ProvinceCode)
 	}
-	err = d.engine.SQL(sql.String()).Find(&datalist)
+	err = d.engine.SQL(sql.String(),args...).Find(&datalist)
 	if err != nil {
 		log.Println(err)
 		return datalist
@@ -82,20 +86,24 @@ func (d *MapMcaDao) GetCity(where entity.CityMcaEntity) []entity.CityMcaEntity {
 
 // 查询一条或多条县区级记录（不传任何值，返回所有）
 func (d *MapMcaDao) GetDistinct(where entity.DistinctMcaEntity) []entity.DistinctMcaEntity {
+	args := make([]interface{}, 0)
 	datalist := make([]entity.DistinctMcaEntity, 0)
 	err := error(nil)
 	var sql bytes.Buffer
 	sql.WriteString("select `place_code` ,`place_name`,`resident`,`population`,`area`,`phone_code`,`post_code`,`city_code` from mca_distinct2019 where  1 = 1 ")
 	if where.PlaceCode != "" {
-		sql.WriteString(" and `place_code` = '" + where.PlaceCode + "'")
+		sql.WriteString(" and `place_code` = ?")
+		args = append(args, where.PlaceCode)
 	}
 	if where.PlaceName != "" {
-		sql.WriteString(" and `place_name` LIKE CONCAT('" + where.PlaceName + "', '%')")
+		sql.WriteString(" and `place_name` LIKE CONCAT(?, '%')")
+		args = append(args, where.PlaceName)
 	}
 	if where.CityCode != "" {
-		sql.WriteString(" and `city_code` = '" + where.CityCode + "'")
+		sql.WriteString(" and `city_code` = ?")
+		args = append(args, where.CityCode)
 	}
-	err = d.engine.SQL(sql.String()).Find(&datalist)
+	err = d.engine.SQL(sql.String(),args...).Find(&datalist)
 	if err != nil {
 		log.Println(err)
 		return datalist

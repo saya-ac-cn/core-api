@@ -7,6 +7,7 @@ import (
 	"github.com/kataras/iris/middleware/recover"
 	"github.com/kataras/iris/sessions"
 	"github.com/kataras/iris/websocket"
+	"log"
 	"time"
 )
 
@@ -51,14 +52,22 @@ func (b *Bootstrapper) SetupSessions(expires time.Duration, cookieHashKey, cooki
 }
 
 // SetupWebsockets prepares the websocket server.
-func (b *Bootstrapper) SetupWebsockets(endpoint string, onConnection websocket.ConnectionFunc) {
-	ws := websocket.New(websocket.Config{})
-	ws.OnConnection(onConnection)
-
-	b.Get(endpoint, ws.Handler())
-	b.Any("/iris-ws.js", func(ctx iris.Context) {
-		ctx.Write(websocket.ClientSource)
+func (b *Bootstrapper) SetupWebsockets(endpoint string) {
+	ws := websocket.New(websocket.DefaultGorillaUpgrader, websocket.Events{
+		websocket.OnNativeMessage: func(nsConn *websocket.NSConn, msg websocket.Message) error {
+			log.Printf("Server got: %s from [%s]", msg.Body, nsConn.Conn.ID())
+			nsConn.Conn.Server().Broadcast(nsConn, msg)
+			return nil
+		},
 	})
+	ws.OnConnect = func(c *websocket.Conn) error {
+		log.Printf("[%s] Connected to server!", c.ID())
+		return nil
+	}
+	b.Get(endpoint, websocket.Handler(ws))
+	ws.OnDisconnect = func(c *websocket.Conn) {
+		log.Printf("[%s] Disconnected from server", c.ID())
+	}
 }
 
 // SetupErrorHandlers prepares the http error handlers
@@ -76,13 +85,6 @@ func (b *Bootstrapper) SetupErrorHandlers() {
 	})
 }
 
-const (
-	// StaticAssets is the root directory for public assets like images, css, js.
-	StaticAssets = "./public/"
-	// Favicon is the relative 9to the "StaticAssets") favicon path for our app.
-	Favicon = "favicon.ico"
-)
-
 // Configure accepts configurations and runs them inside the Bootstraper's context.
 func (b *Bootstrapper) Configure(cs ...Configurator) {
 	for _, c := range cs {
@@ -99,12 +101,6 @@ func (b *Bootstrapper) Bootstrap() *Bootstrapper {
 		[]byte("lot-secret-of-characters-big-too"),
 	)
 	b.SetupErrorHandlers()
-
-	// static files
-	//b.Favicon(StaticAssets + Favicon)
-	//b.StaticWeb(StaticAssets[1:len(StaticAssets)-1], StaticAssets)
-
-	// middleware, after static files
 	b.Use(recover.New())
 	b.Use(logger.New())
 
